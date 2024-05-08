@@ -4,15 +4,16 @@
 #include <cstdint>
 #include "TimedDoor.h"
 
+using ::testing::_;
 using ::testing::Throw;
 
 class MockTimerClient : public TimerClient {
- public:
+public:
     MOCK_METHOD(void, Timeout, (), (override));
 };
 
 class TimedDoorTest : public ::testing::Test {
- protected:
+protected:
     TimedDoor* door;
     MockTimerClient mockClient;
     Timer timer;
@@ -56,19 +57,15 @@ TEST_F(TimedDoorTest, TimeoutCalledOnOpenDoor) {
     EXPECT_CALL(mockClient, Timeout())
         .Times(1)
         .WillOnce(Throw(std::runtime_error("The door is still open!")));
-    ASSERT_THROW({
-        timer.tregister(1, &mockClient);
-        }, std::runtime_error);
+    ASSERT_THROW(timer.tregister(1, &mockClient), std::runtime_error);
 }
 
 TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
     door->lock();
     EXPECT_CALL(mockClient, Timeout())
         .Times(0);
-
     timer.tregister(1, &mockClient);
 }
-
 
 TEST_F(TimedDoorTest, DoorStateAfterTimeoutException) {
     door->unlock();
