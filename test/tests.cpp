@@ -60,14 +60,6 @@ TEST_F(TimedDoorTest, TimeoutCalledOnOpenDoor) {
     ASSERT_THROW(timer.tregister(1, &mockClient), std::runtime_error);
 }
 
-TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
-    door->lock();
-    Timer timer;
-    EXPECT_CALL(mockClient, Timeout()).Times(0);
-
-    timer.tregister(1, &mockClient);
-}
-
 TEST_F(TimedDoorTest, DoorStateAfterTimeoutException) {
     door->unlock();
     try {
@@ -88,4 +80,14 @@ TEST_F(TimedDoorTest, ExceptionIfDoorReopenedAfterTimeoutSet) {
     door->lock();
     door->unlock();
     EXPECT_THROW(door->throwState(), std::runtime_error);
+}
+
+TEST_F(TimedDoorTest, MultipleLockUnlockCycleDoesNotTriggerTimeout) {
+    door->unlock();
+    door->lock();
+    door->unlock();
+    door->lock();
+
+    EXPECT_CALL(mockClient, Timeout()).Times(0);
+    timer.tregister(1, &mockClient);
 }
