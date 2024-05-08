@@ -82,12 +82,14 @@ TEST_F(TimedDoorTest, ExceptionIfDoorReopenedAfterTimeoutSet) {
     EXPECT_THROW(door->throwState(), std::runtime_error);
 }
 
-TEST_F(TimedDoorTest, MultipleLockUnlockCycleDoesNotTriggerTimeout) {
-    door->unlock();
+TEST_F(TimedDoorTest, LockAlreadyClosedDoorDoesNotTriggerTimeout) {
     door->lock();
-    door->unlock();
     door->lock();
-
-    EXPECT_CALL(mockClient, Timeout()).Times(0);
-    timer.tregister(1, &mockClient);
+    EXPECT_FALSE(door->isDoorOpened());
+    try {
+        door->throwState();
+    }
+    catch (...) {
+        ADD_FAILURE();
+    }
 }
