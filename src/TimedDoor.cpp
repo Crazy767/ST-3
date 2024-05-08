@@ -3,8 +3,6 @@
 #include <unistd.h>
 #include <stdexcept>
 #include <iostream>
-#include <chrono>
-#include <thread>
 
 DoorTimerAdapter::DoorTimerAdapter(TimedDoor& door) : door(door) {}
 
@@ -52,5 +50,5 @@ void Timer::tregister(int timeout, TimerClient* client) {
 }
 
 void Timer::sleep(int seconds) {
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    sleep(seconds);
 }
