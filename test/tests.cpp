@@ -65,6 +65,7 @@ TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
     door->lock();
     EXPECT_CALL(mockClient, Timeout())
         .Times(0);
+
     timer.tregister(1, &mockClient);
 }
 
