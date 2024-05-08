@@ -56,14 +56,18 @@ TEST_F(TimedDoorTest, TimeoutCalledOnOpenDoor) {
     EXPECT_CALL(mockClient, Timeout())
         .Times(1)
         .WillOnce(Throw(std::runtime_error("The door is still open!")));
-    timer.tregister(1, &mockClient);
+    ASSERT_THROW({
+        timer.tregister(1, &mockClient);
+        }, std::runtime_error);
 }
 
 TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
     door->lock();
-    EXPECT_CALL(mockClient, Timeout()).Times(0);
+    EXPECT_CALL(mockClient, Timeout())
+        .Times(0);
     timer.tregister(1, &mockClient);
 }
+
 
 TEST_F(TimedDoorTest, DoorStateAfterTimeoutException) {
     door->unlock();
