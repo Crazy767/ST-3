@@ -4,6 +4,8 @@
 #include <cstdint>
 #include "TimedDoor.h"
 
+using ::testing::Throw;
+
 class MockTimerClient : public TimerClient {
  public:
     MOCK_METHOD(void, Timeout, (), (override));
@@ -51,8 +53,9 @@ TEST_F(TimedDoorTest, TimeoutDoesNotThrowWhenDoorIsClosed) {
 
 TEST_F(TimedDoorTest, TimeoutCalledOnOpenDoor) {
     door->unlock();
-    EXPECT_CALL(mockClient, Timeout()).Times(1).WillOnce(
-        Throw(std::runtime_error("The door is still open!")));
+    EXPECT_CALL(mockClient, Timeout())
+        .Times(1)
+        .WillOnce(Throw(std::runtime_error("The door is still open!")));
     timer.tregister(1, &mockClient);
 }
 
@@ -63,7 +66,7 @@ TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
 }
 
 TEST_F(TimedDoorTest, DoorStateAfterTimeoutException) {
-    door->unlock()
+    door->unlock();
     try {
         door->throwState();
     }
