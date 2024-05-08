@@ -7,23 +7,6 @@
 using ::testing::_;
 using ::testing::Throw;
 
-class SleepStrategy {
- public:
-    virtual void sleep(int seconds) = 0;
-};
-
-class RealSleepStrategy : public SleepStrategy {
- public:
-    void sleep(int seconds) override {
-        ::sleep(seconds);
-    }
-};
-
-class MockSleepStrategy : public SleepStrategy {
- public:
-    MOCK_METHOD(void, sleep, (int seconds), (override));
-};
-
 class MockTimerClient : public TimerClient {
  public:
     MOCK_METHOD(void, Timeout, (), (override));
@@ -79,10 +62,7 @@ TEST_F(TimedDoorTest, TimeoutCalledOnOpenDoor) {
 
 TEST_F(TimedDoorTest, NoTimeoutCalledOnClosedDoor) {
     door->lock();
-    MockSleepStrategy mockSleep;
-    Timer timer(&mockSleep);
-
-    EXPECT_CALL(mockSleep, sleep(_)).Times(1);
+    Timer timer;
     EXPECT_CALL(mockClient, Timeout()).Times(0);
 
     timer.tregister(1, &mockClient);
