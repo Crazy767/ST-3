@@ -50,5 +50,5 @@ void Timer::tregister(int timeout, TimerClient* client) {
 }
 
 void Timer::sleep(int seconds) {
-    sleep(seconds);
+    ::sleep(seconds);
 }
